@@ -62,11 +62,15 @@ impl Keyboard {
         let active_layer = self.key_map.get(&active_combo).unwrap();
 
         // get keys from the correct map
-        let keys = self.state
+        let keys: Vec<Key> = self.state
             .iter()
-            .filter_map(|key_loc| active_layer.get(key_loc));
+            .filter_map(|key_loc| active_layer.get(key_loc).copied())
+            .collect();
 
         // add report to the queue if valid
+        if let Ok(kr) = KeyReport::new_from_keys(&keys, &pressed_modifiers) {
+            self.report_queue.push(kr);
+        };
     }
 }
 
@@ -138,12 +142,6 @@ mod tests {
     }
 
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-
-    #[test]
     fn poll_different_states() {
         let test_states = vec![
             vec![(0, 0), (0, 1)],
@@ -157,6 +155,65 @@ mod tests {
         for _ in test_states {
             kbd.poll();
         }
-        dbg!(kbd.report_queue);
+
+        assert_eq!(
+            kbd.report_queue,
+            vec![
+                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0000, [0x08, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0000, [0x08, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0000, [0x1D, 0x00, 0x00, 0x00, 0x00, 0x00]),
+            ]
+        )
+    }
+
+    #[test]
+    fn poll_same_active_states() {
+        let test_states = vec![
+            vec![(0, 0), (0, 1)],
+            vec![(0, 0), (0, 1)],
+            vec![(0, 0), (0, 1)],
+            vec![(0, 0), (0, 1)],
+        ];
+
+        let mut kbd = test_keyboard(TestMatrix::new(test_states.clone()));
+
+        for _ in test_states {
+            kbd.poll();
+        }
+
+        assert_eq!(
+            kbd.report_queue,
+            vec![
+                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+            ]
+        )
+    }
+
+    #[test]
+    fn poll_empty_states() {
+        let test_states = vec![
+            vec![(0, 0), (0, 1)],
+            vec![],
+            vec![],
+            vec![],
+        ];
+
+        let mut kbd = test_keyboard(TestMatrix::new(test_states.clone()));
+
+        for _ in test_states {
+            kbd.poll();
+        }
+
+        assert_eq!(
+            kbd.report_queue,
+            vec![
+                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0000, [0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+            ]
+        )
     }
 }

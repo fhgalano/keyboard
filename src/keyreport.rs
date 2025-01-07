@@ -10,6 +10,14 @@ pub struct KeyReport {
 }
 
 impl KeyReport {
+    pub fn new(modifiers: u8, keys: [u8; 6]) -> Self {
+        Self {
+            modifiers,
+            reserved: 0x00,
+            keys,
+        }
+    }
+
     pub fn new_from_key(key: Key, modifiers: &[Key]) -> Result<Self> {
         Ok(Self {
             modifiers: Self::modifier_byte_from_keys(modifiers)?,
