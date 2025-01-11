@@ -1,8 +1,10 @@
 use super::keys::Key;
 use anyhow::{ anyhow, Result };
+use zerocopy_derive::{ IntoBytes, Immutable };
 
 // structure for keyboard reports as defined by HID
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, PartialEq, IntoBytes, Immutable)]
+#[repr(packed)]
 pub struct KeyReport {
     modifiers: u8,
     reserved: u8,
