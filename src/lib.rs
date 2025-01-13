@@ -10,7 +10,7 @@ pub use keyreport::KeyReport;
 pub use keys::Key;
 pub use matrix::{ Matrix, MatrixLoc };
 
-type Layer = HashMap<MatrixLoc, Key>;
+pub type Layer = HashMap<MatrixLoc, Key>;
 
 pub struct Keyboard {
     matrix: Box<dyn Matrix>,
@@ -38,7 +38,7 @@ impl Keyboard {
     pub fn poll(&mut self) {
         let new_state = self.matrix.poll();
 
-        if new_state != self.state || new_state.len() > 0 {
+        if new_state != self.state || !new_state.is_empty() {
             self.state = new_state;
             self.eval_state();
         }
@@ -71,6 +71,10 @@ impl Keyboard {
         if let Ok(kr) = KeyReport::new_from_keys(&keys, &pressed_modifiers) {
             self.report_queue.push(kr);
         };
+    }
+
+    pub fn give_report(&mut self) -> Option<KeyReport> {
+        self.report_queue.pop()
     }
 }
 
@@ -159,7 +163,7 @@ mod tests {
         assert_eq!(
             kbd.report_queue,
             vec![
-                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0010, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
                 KeyReport::new(0b0000_0000, [0x08, 0x00, 0x00, 0x00, 0x00, 0x00]),
                 KeyReport::new(0b0000_0000, [0x08, 0x00, 0x00, 0x00, 0x00, 0x00]),
                 KeyReport::new(0b0000_0000, [0x1D, 0x00, 0x00, 0x00, 0x00, 0x00]),
@@ -185,10 +189,10 @@ mod tests {
         assert_eq!(
             kbd.report_queue,
             vec![
-                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
-                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
-                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
-                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0010, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0010, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0010, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0010, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
             ]
         )
     }
@@ -211,7 +215,7 @@ mod tests {
         assert_eq!(
             kbd.report_queue,
             vec![
-                KeyReport::new(0b0100_0000, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
+                KeyReport::new(0b0000_0010, [0x07, 0x00, 0x00, 0x00, 0x00, 0x00]),
                 KeyReport::new(0b0000_0000, [0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
             ]
         )

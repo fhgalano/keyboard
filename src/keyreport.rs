@@ -48,14 +48,14 @@ impl KeyReport {
         let mut modifier_byte: u8 = 0;
         for key in modifiers {
             match key {
-                Key::LCTRL => modifier_byte |= 0b1000_0000,
-                Key::LSHIFT => modifier_byte |= 0b0100_0000,
-                Key::LALT => modifier_byte |= 0b0010_0000,
-                Key::LSUPER => modifier_byte |= 0b0001_0000,
-                Key::RCTRL => modifier_byte |= 0b0000_1000,
-                Key::RSHIFT => modifier_byte |= 0b0000_0100,
-                Key::RALT => modifier_byte |= 0b0000_0010,
-                Key::RSUPER => modifier_byte |= 0b0000_0001,
+                Key::LCTRL => modifier_byte |= 0b0000_0001,
+                Key::LSHIFT => modifier_byte |= 0b0000_0010,
+                Key::LALT => modifier_byte |= 0b0000_0100,
+                Key::LSUPER => modifier_byte |= 0b0000_1000,
+                Key::RCTRL => modifier_byte |= 0b0001_0000,
+                Key::RSHIFT => modifier_byte |= 0b0010_0000,
+                Key::RALT => modifier_byte |= 0b0100_0000,
+                Key::RSUPER => modifier_byte |= 0b1000_0000,
                 _ => (),
             }
         }
@@ -87,7 +87,7 @@ mod tests {
         assert_eq!(
             kr, 
             KeyReport {
-                modifiers: 0b1000_0000,
+                modifiers: 0b0000_0001,
                 reserved: 0x00,
                 keys: [0x07, 0x00, 0x00, 0x00, 0x00, 0x00],
             }
@@ -101,7 +101,7 @@ mod tests {
         assert_eq!(
             kr, 
             KeyReport {
-                modifiers: 0b1000_0000,
+                modifiers: 0b0000_0001,
                 reserved: 0x00,
                 keys: [0xFF, 0x00, 0x00, 0x00, 0x00, 0x00],
             }
@@ -123,7 +123,7 @@ mod tests {
         assert_eq!(
             kr, 
             KeyReport {
-                modifiers: 0b0100_0000,
+                modifiers: 0b0000_0010,
                 reserved: 0x00,
                 keys: [0x07, 0x08, 0x00, 0x00, 0x00, 0x00],
             }
@@ -154,7 +154,7 @@ mod tests {
     #[test]
     fn double_modifiers() {
         let modifier_byte = KeyReport::modifier_byte_from_keys(&[Key::LALT, Key::LALT, Key::RALT]).unwrap();
-        assert_eq!(modifier_byte, 0b0010_0010);
+        assert_eq!(modifier_byte, 0b0100_0100);
     }
 
     #[test]
@@ -168,6 +168,6 @@ mod tests {
     #[test]
     fn ctrl_alt_active() {
         let modifier_byte = KeyReport::modifier_byte_from_keys(&[Key::LCTRL, Key::LALT]).unwrap();
-        assert_eq!(modifier_byte, 0b1010_0000);
+        assert_eq!(modifier_byte, 0b0000_0101);
     }
 }
