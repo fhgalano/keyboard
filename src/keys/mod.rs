@@ -17,6 +17,7 @@ pub enum Key {
     RSUPER,
     // custom modifiers
     HAT,
+    PAW,
     // normal keys
 	Aa,
 	Bb,
@@ -76,6 +77,7 @@ pub enum Key {
 	SPACE,
 	CAPS_LOCK,
 	DELETE,
+    PRINT_SCREEN,
 
 	// Function
 	F1,
@@ -90,6 +92,12 @@ pub enum Key {
 	F10,
 	F11,
 	F12,
+
+    // Arrows
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
 
 }
 
@@ -109,6 +117,7 @@ impl Key {
             Self::RSUPER => 0xE7,
 
             Self::HAT => CUSTOM_KEY,
+            Self::PAW => CUSTOM_KEY,
 
 			Self::Aa => 0x04,
 			Self::Bb => 0x05,
@@ -169,6 +178,7 @@ impl Key {
 			Self::SPACE => 0x2C,
 			Self::CAPS_LOCK => 0x39,
 			Self::DELETE => 0x4C,
+            Self::PRINT_SCREEN => 0x46,
 
             // Function Keys
 			Self::F1 => 0x3A,
@@ -183,6 +193,12 @@ impl Key {
 			Self::F10 => 0x43,
 			Self::F11 => 0x44,
 			Self::F12 => 0x45,
+
+            // Arrows
+            Self::RIGHT => 0x4F,
+            Self::LEFT => 0x50,
+            Self::DOWN => 0x51,
+            Self::UP => 0x52,
         }
     }
 
@@ -201,7 +217,7 @@ impl Key {
         ]
     }
 
-    pub fn modifiers() -> [Self; 9] {
+    pub fn modifiers() -> [Self; 10] {
         [
             Self::LCTRL,
             Self::LSHIFT,
@@ -213,6 +229,7 @@ impl Key {
             Self::RSUPER,
             // custom modifiers
             Self::HAT,
+            Self::PAW,
         ]
     }
 }
