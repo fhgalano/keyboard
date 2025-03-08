@@ -78,6 +78,30 @@ impl Keyboard {
     }
 }
 
+// note, MatrixLoc are row,col format (i think)
+#[allow(unused)]
+#[macro_export]
+macro_rules! layer {
+    (
+        $([$($key:expr),+]),+ $(,)?
+    ) =>{
+        {
+            let mut layer: Layer = HashMap::new();
+            let mut row: u8 = 0;
+            $(
+                let mut col: u8 = 0;
+                $(
+                    layer.insert((row, col), $key);
+                    col += 1;
+                )+
+                row += 1;
+            )+
+
+            layer
+        }
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -219,5 +243,35 @@ mod tests {
                 KeyReport::new(0b0000_0000, [0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
             ]
         )
+    }
+
+    #[test]
+    fn test_simple_layer() {
+        let test_layer = layer!(
+            [Key::Dd, Key::Ee, Key::Ee, Key::Zz],
+            [Key::Nn, Key::Uu, Key::Tt, Key::Ss],
+            [Key::Hh, Key::NOKEY, Key::NOKEY, Key::Ii],
+        );
+
+        let mut expected_layer: Layer = HashMap::new();
+        // row 1
+        expected_layer.insert((0,0), Key::Dd);
+        expected_layer.insert((0,1), Key::Ee);
+        expected_layer.insert((0,2), Key::Ee);
+        expected_layer.insert((0,3), Key::Zz);
+        
+        // row 2
+        expected_layer.insert((1,0), Key::Nn);
+        expected_layer.insert((1,1), Key::Uu);
+        expected_layer.insert((1,2), Key::Tt);
+        expected_layer.insert((1,3), Key::Ss);
+
+        // row 3
+        expected_layer.insert((2,0), Key::Hh);
+        expected_layer.insert((2,1), Key::NOKEY);
+        expected_layer.insert((2,2), Key::NOKEY);
+        expected_layer.insert((2,3), Key::Ii);
+
+        assert_eq!(test_layer, expected_layer);
     }
 }
