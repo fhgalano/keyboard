@@ -8,7 +8,7 @@ use std::collections::HashMap;
 pub use keycombo::KeyCombo;
 pub use keyreport::KeyReport;
 pub use keys::Key;
-pub use matrix::{ Matrix, MatrixLoc };
+pub use matrix::{ Matrix, MatrixLoc, MatrixLoc2 };
 
 pub type Layer = HashMap<MatrixLoc, Key>;
 
