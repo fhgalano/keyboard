@@ -35,16 +35,17 @@ impl Keyboard {
         }
     }
 
-    pub fn poll(&mut self) {
+    pub fn poll(&mut self) -> Option<State> {
         let new_state = self.matrix.poll();
 
         if new_state != self.state || !new_state.is_empty() {
             self.state = new_state;
-            self.eval_state();
+            return Some(self.eval_state())
         }
+        None
     }
 
-    fn eval_state(&mut self) {
+    fn eval_state(&mut self) -> State {
         // check for modifier keys
         let pressed_modifiers: Vec<_> = self.state
             .iter()
@@ -71,6 +72,8 @@ impl Keyboard {
         if let Ok(kr) = KeyReport::new_from_keys(&keys, &pressed_modifiers) {
             self.report_queue.push(kr);
         };
+
+        State::new(keys, pressed_modifiers)
     }
 
     pub fn give_report(&mut self) -> Option<KeyReport> {
@@ -91,7 +94,9 @@ macro_rules! layer {
             $(
                 let mut col: u8 = 0;
                 $(
-                    layer.insert((row, col), $key);
+                    if $key != Key::NOKEY {
+                        layer.insert((row, col), $key);
+                    }
                     col += 1;
                 )+
                 row += 1;
@@ -100,6 +105,21 @@ macro_rules! layer {
             layer
         }
     };
+}
+
+#[derive(Debug)]
+pub struct State {
+    pub modifiers: Vec<Key>,
+    pub keys: Vec<Key>,
+}
+
+impl State {
+    pub fn new(keys: Vec<Key>, modifiers: Vec<Key>) -> Self {
+        Self {
+            keys,
+            modifiers,
+        }
+    }
 }
 
 #[cfg(test)]
