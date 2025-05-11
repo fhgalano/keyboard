@@ -17,6 +17,10 @@ pub enum Key {
     RSUPER,
     // custom modifiers
     HAT,
+    STACHE,
+    CANE,
+    TUX,
+    TIE,
     PAW,
     // normal keys
 	Aa,
@@ -118,6 +122,10 @@ impl Key {
 
             Self::HAT => CUSTOM_KEY,
             Self::PAW => CUSTOM_KEY,
+            Self::STACHE => CUSTOM_KEY,
+            Self::CANE => CUSTOM_KEY,
+            Self::TUX => CUSTOM_KEY,
+            Self::TIE => CUSTOM_KEY,
 
 			Self::Aa => 0x04,
 			Self::Bb => 0x05,
@@ -217,7 +225,7 @@ impl Key {
         ]
     }
 
-    pub fn modifiers() -> [Self; 10] {
+    pub fn modifiers() -> [Self; 14] {
         [
             Self::LCTRL,
             Self::LSHIFT,
@@ -227,9 +235,14 @@ impl Key {
             Self::RSHIFT,
             Self::RALT,
             Self::RSUPER,
+
             // custom modifiers
             Self::HAT,
             Self::PAW,
+            Self::STACHE,
+            Self::CANE,
+            Self::TUX,
+            Self::TIE,
         ]
     }
 }
