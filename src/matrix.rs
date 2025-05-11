@@ -4,7 +4,7 @@ use zerocopy_derive::{Immutable, IntoBytes, FromBytes};
 
 pub type MatrixLoc = (u8, u8);
 
-#[derive(Debug, Immutable, IntoBytes, FromBytes, PartialEq)]
+#[derive(Clone, Debug, Immutable, IntoBytes, FromBytes, PartialEq)]
 pub struct MatrixLoc2(pub u8, pub u8);
 
 impl std::convert::From<(u8, u8)> for MatrixLoc2 {
