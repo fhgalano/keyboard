@@ -1,5 +1,5 @@
 use super::keys::Key;
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Default, Clone, Copy, Eq, Hash, PartialEq)]
 pub struct KeyCombo {

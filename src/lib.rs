@@ -1,20 +1,28 @@
+#![no_std]
+
 mod keycombo;
 mod keyreport;
 mod keys;
 mod matrix;
 
-use std::boxed::Box;
-use std::collections::HashMap;
+extern crate alloc;
+
+use alloc::{
+    boxed::Box,
+    vec::Vec,
+};
+use heapless::index_map::FnvIndexMap;
+
 pub use keycombo::KeyCombo;
 pub use keyreport::KeyReport;
 pub use keys::Key;
 pub use matrix::{ Matrix, MatrixLoc, MatrixLoc2 };
 
-pub type Layer = HashMap<MatrixLoc, Key>;
+pub type Layer = FnvIndexMap<MatrixLoc, Key, 128>;
 
 pub struct Keyboard {
     matrix: Box<dyn Matrix>,
-    key_map: HashMap<KeyCombo, Layer>,
+    key_map: FnvIndexMap<KeyCombo, Layer, 4>,
     modifier_map: Layer, // specific layer for holding modifier keys
     report_queue: Vec<KeyReport>,
     state: Vec<MatrixLoc>,
@@ -23,7 +31,7 @@ pub struct Keyboard {
 impl Keyboard {
     pub fn new(
         matrix: Box<dyn Matrix>, 
-        key_map: HashMap<KeyCombo, Layer>,
+        key_map: FnvIndexMap<KeyCombo, Layer, 4>,
         modifier_map: Layer, // specific layer for holding modifier keys
     ) -> Self {
         Self {
@@ -89,7 +97,7 @@ macro_rules! layer {
         $([$($key:expr),+]),+ $(,)?
     ) =>{
         {
-            let mut layer: Layer = HashMap::new();
+            let mut layer: Layer = heapless::index_map::FnvIndexMap::new();
             let mut row: u8 = 0;
             $(
                 let mut col: u8 = 0;
@@ -126,6 +134,8 @@ impl State {
 mod tests {
     use super::*;
 
+    use alloc::vec;
+
     struct TestMatrix {
         state: Vec<MatrixLoc>,
         pos: usize,
@@ -157,21 +167,21 @@ mod tests {
         }
     }
 
-    fn test_layermap() -> HashMap<KeyCombo, Layer> {
-        let mut base_map = HashMap::new();
+    fn test_layermap() -> FnvIndexMap<KeyCombo, Layer, 4> {
+        let mut base_map = FnvIndexMap::new();
         base_map.insert((0, 1), Key::Dd);
         base_map.insert((0, 2), Key::Ee);
         base_map.insert((1, 1), Key::Ee);
         base_map.insert((1, 2), Key::Zz);
 
-        let mut bigmap = HashMap::new();
+        let mut bigmap = FnvIndexMap::new();
         bigmap.insert(KeyCombo::default(), base_map);
         
         bigmap
     }
 
     fn test_modifier_map() -> Layer {
-        let mut mod_layer = HashMap::new();
+        let mut mod_layer = FnvIndexMap::new();
         mod_layer.insert((0, 0), Key::LSHIFT);
         mod_layer.insert((1, 0), Key::LCTRL);
 
@@ -273,7 +283,7 @@ mod tests {
             [Key::Hh, Key::NOKEY, Key::NOKEY, Key::Ii],
         );
 
-        let mut expected_layer: Layer = HashMap::new();
+        let mut expected_layer: Layer = FnvIndexMap::new();
         // row 1
         expected_layer.insert((0,0), Key::Dd);
         expected_layer.insert((0,1), Key::Ee);
