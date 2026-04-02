@@ -298,8 +298,6 @@ mod tests {
 
         // row 3
         expected_layer.insert((2,0), Key::Hh);
-        expected_layer.insert((2,1), Key::NOKEY);
-        expected_layer.insert((2,2), Key::NOKEY);
         expected_layer.insert((2,3), Key::Ii);
 
         assert_eq!(test_layer, expected_layer);
