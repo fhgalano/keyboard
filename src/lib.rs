@@ -16,7 +16,7 @@ use heapless::index_map::FnvIndexMap;
 pub use keycombo::KeyCombo;
 pub use keyreport::KeyReport;
 pub use keys::Key;
-pub use matrix::{ Matrix, MatrixLoc, MatrixLoc2 };
+pub use matrix::{ Matrix, MatrixLoc, PhantomMatrix };
 
 pub type Layer = FnvIndexMap<MatrixLoc, Key, 128>;
 
@@ -103,7 +103,7 @@ macro_rules! layer {
                 let mut col: u8 = 0;
                 $(
                     if $key != Key::NOKEY {
-                        layer.insert((row, col), $key);
+                        layer.insert((row, col).into(), $key);
                     }
                     col += 1;
                 )+
@@ -169,10 +169,10 @@ mod tests {
 
     fn test_layermap() -> FnvIndexMap<KeyCombo, Layer, 4> {
         let mut base_map = FnvIndexMap::new();
-        base_map.insert((0, 1), Key::Dd);
-        base_map.insert((0, 2), Key::Ee);
-        base_map.insert((1, 1), Key::Ee);
-        base_map.insert((1, 2), Key::Zz);
+        base_map.insert(MatrixLoc(0, 1), Key::Dd);
+        base_map.insert(MatrixLoc(0, 2), Key::Ee);
+        base_map.insert(MatrixLoc(1, 1), Key::Ee);
+        base_map.insert(MatrixLoc(1, 2), Key::Zz);
 
         let mut bigmap = FnvIndexMap::new();
         bigmap.insert(KeyCombo::default(), base_map);
@@ -182,8 +182,8 @@ mod tests {
 
     fn test_modifier_map() -> Layer {
         let mut mod_layer = FnvIndexMap::new();
-        mod_layer.insert((0, 0), Key::LSHIFT);
-        mod_layer.insert((1, 0), Key::LCTRL);
+        mod_layer.insert(MatrixLoc(0, 0), Key::LSHIFT);
+        mod_layer.insert(MatrixLoc(1, 0), Key::LCTRL);
 
         mod_layer
     }
@@ -202,10 +202,10 @@ mod tests {
     #[test]
     fn poll_different_states() {
         let test_states = vec![
-            vec![(0, 0), (0, 1)],
-            vec![(0, 2)],
-            vec![(0, 2)],
-            vec![(1, 2)],
+            vec![MatrixLoc(0, 0), MatrixLoc(0, 1)],
+            vec![MatrixLoc(0, 2)],
+            vec![MatrixLoc(0, 2)],
+            vec![MatrixLoc(1, 2)],
         ];
 
         let mut kbd = test_keyboard(TestMatrix::new(test_states.clone()));
@@ -228,10 +228,10 @@ mod tests {
     #[test]
     fn poll_same_active_states() {
         let test_states = vec![
-            vec![(0, 0), (0, 1)],
-            vec![(0, 0), (0, 1)],
-            vec![(0, 0), (0, 1)],
-            vec![(0, 0), (0, 1)],
+            vec![MatrixLoc(0, 0), MatrixLoc(0, 1)],
+            vec![MatrixLoc(0, 0), MatrixLoc(0, 1)],
+            vec![MatrixLoc(0, 0), MatrixLoc(0, 1)],
+            vec![MatrixLoc(0, 0), MatrixLoc(0, 1)],
         ];
 
         let mut kbd = test_keyboard(TestMatrix::new(test_states.clone()));
@@ -254,7 +254,7 @@ mod tests {
     #[test]
     fn poll_empty_states() {
         let test_states = vec![
-            vec![(0, 0), (0, 1)],
+            vec![MatrixLoc(0, 0), MatrixLoc(0, 1)],
             vec![],
             vec![],
             vec![],
@@ -285,20 +285,20 @@ mod tests {
 
         let mut expected_layer: Layer = FnvIndexMap::new();
         // row 1
-        expected_layer.insert((0,0), Key::Dd);
-        expected_layer.insert((0,1), Key::Ee);
-        expected_layer.insert((0,2), Key::Ee);
-        expected_layer.insert((0,3), Key::Zz);
+        expected_layer.insert(MatrixLoc(0,0), Key::Dd);
+        expected_layer.insert(MatrixLoc(0,1), Key::Ee);
+        expected_layer.insert(MatrixLoc(0,2), Key::Ee);
+        expected_layer.insert(MatrixLoc(0,3), Key::Zz);
         
         // row 2
-        expected_layer.insert((1,0), Key::Nn);
-        expected_layer.insert((1,1), Key::Uu);
-        expected_layer.insert((1,2), Key::Tt);
-        expected_layer.insert((1,3), Key::Ss);
+        expected_layer.insert(MatrixLoc(1,0), Key::Nn);
+        expected_layer.insert(MatrixLoc(1,1), Key::Uu);
+        expected_layer.insert(MatrixLoc(1,2), Key::Tt);
+        expected_layer.insert(MatrixLoc(1,3), Key::Ss);
 
         // row 3
-        expected_layer.insert((2,0), Key::Hh);
-        expected_layer.insert((2,3), Key::Ii);
+        expected_layer.insert(MatrixLoc(2,0), Key::Hh);
+        expected_layer.insert(MatrixLoc(2,3), Key::Ii);
 
         assert_eq!(test_layer, expected_layer);
     }

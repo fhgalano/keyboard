@@ -6,9 +6,9 @@ use zerocopy_derive::{ IntoBytes, Immutable };
 #[derive(Debug, Default, PartialEq, IntoBytes, Immutable)]
 #[repr(packed)]
 pub struct KeyReport {
-    modifiers: u8,
+    pub modifiers: u8,
     reserved: u8,
-    keys: [u8; 6],
+    pub keys: [u8; 6],
 }
 
 impl KeyReport {
