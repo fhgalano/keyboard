@@ -24,3 +24,17 @@ impl core::convert::From<(u8, u8)> for MatrixLoc {
 pub trait Matrix {
     fn poll(&mut self) -> Vec<MatrixLoc>;
 }
+
+pub struct PhantomMatrix;
+
+impl PhantomMatrix {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Matrix for PhantomMatrix {
+    fn poll(&mut self) -> Vec<MatrixLoc> {
+        Vec::new()
+    }
+}
